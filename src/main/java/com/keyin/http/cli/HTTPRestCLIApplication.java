@@ -16,82 +16,192 @@ public class HTTPRestCLIApplication {
     public String generateAirportReport() {
         List<Airport> airports = getRestClient().getAllAirports();
 
-        StringBuffer report = new StringBuffer();
+        StringBuilder report = new StringBuilder();
 
         for (Airport airport : airports) {
-            report.append(airport.getName());
-            report.append(" - ");
-            report.append(airport.getCode());
-
-            if (airports.indexOf(airport) != (airports.size() - 1)) {
-                report.append(",");
-            }
+            report.append(airport.getName())
+                    .append(" - ")
+                    .append(airport.getCode())
+                    .append("\n");
         }
 
         System.out.println(report.toString());
-
         return report.toString();
     }
 
     public String generateAircraftReport() {
         List<Aircraft> aircrafts = getRestClient().getAllAircrafts();
 
-        StringBuffer report = new StringBuffer();
+        StringBuilder report = new StringBuilder();
 
         for (Aircraft aircraft : aircrafts) {
-            report.append(aircraft.getType());
-            report.append(" - ");
-            report.append(aircraft.getAirlineName());
-
-            if (aircrafts.indexOf(aircraft) != (aircrafts.size() - 1)) {
-                report.append(",");
-            }
+            report.append(aircraft.getType())
+                    .append(" - ")
+                    .append(aircraft.getAirlineName())
+                    .append("\n");
         }
 
         System.out.println(report.toString());
-
         return report.toString();
     }
 
     public String generateCityReport() {
         List<City> cities = getRestClient().getAllCities();
 
-        StringBuffer report = new StringBuffer();
+        StringBuilder report = new StringBuilder();
 
         for (City city : cities) {
-            report.append(city.getName());
-            report.append(" - ");
-            report.append(city.getState());
-
-            if (cities.indexOf(city) != (cities.size() - 1)) {
-                report.append(",");
-            }
+            report.append(city.getName())
+                    .append(" - ")
+                    .append(city.getState())
+                    .append("\n");
         }
 
         System.out.println(report.toString());
-
         return report.toString();
     }
 
     public String generatePassengerReport() {
         List<Passenger> passengers = getRestClient().getAllPassengers();
 
-        StringBuffer report = new StringBuffer();
+        StringBuilder report = new StringBuilder();
 
         for (Passenger passenger : passengers) {
-            report.append(passenger.getFirstName());
-            report.append(" ");
-            report.append(passenger.getLastName());
-            report.append(" - ");
-            report.append(passenger.getPhoneNumber());
+            report.append(passenger.getFirstName())
+                    .append(" ")
+                    .append(passenger.getLastName())
+                    .append(" - ")
+                    .append(passenger.getPhoneNumber())
+                    .append("\n");
+        }
 
-            if (passengers.indexOf(passenger) != (passengers.size() - 1)) {
-                report.append(",");
+        System.out.println(report.toString());
+        return report.toString();
+    }
+
+    public String generateAirportsInCitiesReport() {
+        List<City> cities = getRestClient().getAllCities();
+
+        StringBuilder report = new StringBuilder();
+
+        for (City city : cities) {
+            report.append("City: ")
+                    .append(city.getName())
+                    .append(" - ")
+                    .append(city.getState())
+                    .append("\n");
+
+            List<Airport> airports = city.getAirports();
+            if (airports != null && !airports.isEmpty()) {
+                for (Airport airport : airports) {
+                    report.append("  Airport: ")
+                            .append(airport.getName())
+                            .append(" - ")
+                            .append(airport.getCode())
+                            .append("\n");
+                }
+            } else {
+                report.append("  No airports found for this city.\n");
             }
         }
 
         System.out.println(report.toString());
+        return report.toString();
+    }
 
+    public String generateAircraftPassengersReport() {
+        List<Passenger> passengers = getRestClient().getAllPassengers();
+
+        StringBuilder report = new StringBuilder();
+
+        for (Passenger passenger : passengers) {
+            report.append("Passenger: ")
+                    .append(passenger.getFirstName())
+                    .append(" ")
+                    .append(passenger.getLastName())
+                    .append("\n");
+
+            List<Aircraft> aircrafts = passenger.getAircraft();
+            if (aircrafts != null && !aircrafts.isEmpty()) {
+                for (Aircraft aircraft : aircrafts) {
+                    report.append("  Aircraft: ")
+                            .append(aircraft.getType())
+                            .append(" - ")
+                            .append(aircraft.getAirlineName())
+                            .append("\n");
+                }
+            } else {
+                report.append("  No aircraft found for this passenger.\n");
+            }
+        }
+
+        System.out.println(report.toString());
+        return report.toString();
+    }
+
+    public String generateAirportsForAircraftReport() {
+        List<Aircraft> aircrafts = getRestClient().getAllAircrafts();
+
+        StringBuilder report = new StringBuilder();
+
+        for (Aircraft aircraft : aircrafts) {
+            report.append("Aircraft: ")
+                    .append(aircraft.getType())
+                    .append(" - ")
+                    .append(aircraft.getAirlineName())
+                    .append("\n");
+
+            // Assuming aircraft has a list of airports it can operate from
+            List<Airport> airports = aircraft.getAirports();
+            if (airports != null && !airports.isEmpty()) {
+                for (Airport airport : airports) {
+                    report.append("  Airport: ")
+                            .append(airport.getName())
+                            .append(" - ")
+                            .append(airport.getCode())
+                            .append("\n");
+                }
+            } else {
+                report.append("  No airports found for this aircraft.\n");
+            }
+        }
+
+        System.out.println(report.toString());
+        return report.toString();
+    }
+
+    public String generateAirportsUsedByPassengersReport() {
+        List<Passenger> passengers = getRestClient().getAllPassengers();
+
+        StringBuilder report = new StringBuilder();
+
+        for (Passenger passenger : passengers) {
+            report.append("Passenger: ")
+                    .append(passenger.getFirstName())
+                    .append(" ")
+                    .append(passenger.getLastName())
+                    .append("\n");
+
+            City city = passenger.getCity();
+            if (city != null) {
+                List<Airport> airports = city.getAirports();
+                if (airports != null && !airports.isEmpty()) {
+                    for (Airport airport : airports) {
+                        report.append("  Airport: ")
+                                .append(airport.getName())
+                                .append(" - ")
+                                .append(airport.getCode())
+                                .append("\n");
+                    }
+                } else {
+                    report.append("  No airports found for this city.\n");
+                }
+            } else {
+                report.append("  No city found for this passenger.\n");
+            }
+        }
+
+        System.out.println(report.toString());
         return report.toString();
     }
 
@@ -138,7 +248,11 @@ public class HTTPRestCLIApplication {
                 System.out.println("3. List Cities");
                 System.out.println("4. List Passengers");
                 System.out.println("5. Get Greeting");
-                System.out.println("6. Exit");
+                System.out.println("6. List Airports in Cities");
+                System.out.println("7. List Aircraft Passengers Have Traveled On");
+                System.out.println("8. List Airports for Aircraft");
+                System.out.println("9. List Airports Used by Passengers");
+                System.out.println("10. Exit");
                 System.out.print("Enter your choice: ");
 
                 int choice = scanner.nextInt();
@@ -161,6 +275,18 @@ public class HTTPRestCLIApplication {
                         cliApp.listGreetings();
                         break;
                     case 6:
+                        cliApp.generateAirportsInCitiesReport();
+                        break;
+                    case 7:
+                        cliApp.generateAircraftPassengersReport();
+                        break;
+                    case 8:
+                        cliApp.generateAirportsForAircraftReport();
+                        break;
+                    case 9:
+                        cliApp.generateAirportsUsedByPassengersReport();
+                        break;
+                    case 10:
                         System.out.println("Exiting...");
                         scanner.close();
                         return;

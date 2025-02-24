@@ -79,4 +79,11 @@ public class Aircraft {
     public int hashCode() {
         return Objects.hash(id);
     }
+
+    public List<Airport> getAirports() {
+        List<Airport> airports = List.of();
+        return airports; // Return the list of airports
+    }
+
+    
 }
