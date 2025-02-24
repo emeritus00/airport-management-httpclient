@@ -5,8 +5,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.keyin.domain.Airport;
+import com.keyin.domain.Aircraft;
+import com.keyin.domain.City;
+import com.keyin.domain.Passenger;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -24,52 +26,61 @@ public class RESTClient {
 
         try {
             HttpResponse<String> response = getClient().send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode()!=200) {
+            if (response.statusCode() != 200) {
                 System.out.println("Status Code: " + response.statusCode());
             }
 
             responseBody = response.body();
 
-        } catch (IOException | InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         return responseBody;
     }
 
-
     public List<Airport> getAllAirports() {
-        List<Airport> airports = new ArrayList<Airport>();
+        return fetchDataFromEndpoint("/airports", new TypeReference<List<Airport>>() {});
+    }
 
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(serverURL)).build();
+    public List<Aircraft> getAllAircrafts() {
+        return fetchDataFromEndpoint("/aircrafts", new TypeReference<List<Aircraft>>() {});
+    }
+
+    public List<City> getAllCities() {
+        return fetchDataFromEndpoint("/cities", new TypeReference<List<City>>() {});
+    }
+
+    public List<Passenger> getAllPassengers() {
+        return fetchDataFromEndpoint("/passengers", new TypeReference<List<Passenger>>() {});
+    }
+
+    private <T> List<T> fetchDataFromEndpoint(String endpoint, TypeReference<List<T>> typeReference) {
+        List<T> data = new ArrayList<>();
 
         try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(serverURL + endpoint))
+                    .GET()
+                    .build();
+
             HttpResponse<String> response = getClient().send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode()==200) {
-                System.out.println("***** " + response.body());
+            if (response.statusCode() == 200) {
+                data = buildListFromResponse(response.body(), typeReference);
             } else {
                 System.out.println("Error Status Code: " + response.statusCode());
             }
-
-            airports = buildAirportListFromResponse(response.body());
-
-
-        } catch (IOException | InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
-
-        return airports;
+        return data;
     }
 
-    public List<Airport> buildAirportListFromResponse(String response) throws JsonProcessingException {
-        List<Airport> airports = new ArrayList<Airport>();
-
+    public <T> List<T> buildListFromResponse(String response, TypeReference<List<T>> typeReference) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-        airports = mapper.readValue(response, new TypeReference<List<Airport>>(){});
-
-        return airports;
+        return mapper.readValue(response, typeReference);
     }
 
     public String getServerURL() {
@@ -82,7 +93,7 @@ public class RESTClient {
 
     public HttpClient getClient() {
         if (client == null) {
-            client  = HttpClient.newHttpClient();
+            client = HttpClient.newHttpClient();
         }
 
         return client;
