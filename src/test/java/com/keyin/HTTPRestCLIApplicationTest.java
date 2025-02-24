@@ -1,6 +1,9 @@
 package com.keyin;
 
 import com.keyin.domain.Airport;
+import com.keyin.domain.Aircraft;
+import com.keyin.domain.City;
+import com.keyin.domain.Passenger;
 import com.keyin.http.cli.HTTPRestCLIApplication;
 import com.keyin.http.client.RESTClient;
 import org.junit.jupiter.api.Assertions;
@@ -27,7 +30,7 @@ public class HTTPRestCLIApplicationTest {
         stJohnsAirport.setName("St. John's Airport");
         stJohnsAirport.setId(1);
 
-        List<Airport> airportList = new ArrayList<Airport>();
+        List<Airport> airportList = new ArrayList<>();
         airportList.add(stJohnsAirport);
 
         Mockito.when(mockRESTClient.getAllAirports()).thenReturn(airportList);
@@ -37,15 +40,69 @@ public class HTTPRestCLIApplicationTest {
         Assertions.assertTrue(httpRestCLIApplicationUnderTest.generateAirportReport().contains("YYT"));
     }
 
-
-    public void _testGenerateAirportReportWithError() {
+    @Test
+    public void testGenerateAircraftReport() {
         HTTPRestCLIApplication httpRestCLIApplicationUnderTest = new HTTPRestCLIApplication();
 
-        RESTClient restClient = new RESTClient();
-        restClient.setServerURL("http://localhost:8080/airports");
+        Aircraft aircraft = new Aircraft();
+        aircraft.setType("Boeing 747");
+        aircraft.setAirlineName("Air Canada");
 
-        httpRestCLIApplicationUnderTest.setRestClient(restClient);
+        List<Aircraft> aircraftList = new ArrayList<>();
+        aircraftList.add(aircraft);
 
-        Assertions.assertTrue(httpRestCLIApplicationUnderTest.generateAirportReport().contains("YYT"));
+        Mockito.when(mockRESTClient.getAllAircrafts()).thenReturn(aircraftList);
+
+        httpRestCLIApplicationUnderTest.setRestClient(mockRESTClient);
+
+        Assertions.assertTrue(httpRestCLIApplicationUnderTest.generateAircraftReport().contains("Boeing 747"));
+    }
+
+    @Test
+    public void testGenerateCityReport() {
+        HTTPRestCLIApplication httpRestCLIApplicationUnderTest = new HTTPRestCLIApplication();
+
+        City city = new City();
+        city.setName("St. John's");
+        city.setState("NL");
+
+        List<City> cityList = new ArrayList<>();
+        cityList.add(city);
+
+        Mockito.when(mockRESTClient.getAllCities()).thenReturn(cityList);
+
+        httpRestCLIApplicationUnderTest.setRestClient(mockRESTClient);
+
+        Assertions.assertTrue(httpRestCLIApplicationUnderTest.generateCityReport().contains("St. John's"));
+    }
+
+    @Test
+    public void testGeneratePassengerReport() {
+        HTTPRestCLIApplication httpRestCLIApplicationUnderTest = new HTTPRestCLIApplication();
+
+        Passenger passenger = new Passenger();
+        passenger.setFirstName("Adejoke");
+        passenger.setLastName("Adewale");
+        passenger.setPhoneNumber("709-456-7890");
+
+        List<Passenger> passengerList = new ArrayList<>();
+        passengerList.add(passenger);
+
+        Mockito.when(mockRESTClient.getAllPassengers()).thenReturn(passengerList);
+
+        httpRestCLIApplicationUnderTest.setRestClient(mockRESTClient);
+
+        Assertions.assertTrue(httpRestCLIApplicationUnderTest.generatePassengerReport().contains("Adejoke Adewale"));
+    }
+
+    @Test
+    public void testGenerateAirportReportWithError() {
+        HTTPRestCLIApplication httpRestCLIApplicationUnderTest = new HTTPRestCLIApplication();
+
+        Mockito.when(mockRESTClient.getAllAirports()).thenReturn(new ArrayList<>());
+
+        httpRestCLIApplicationUnderTest.setRestClient(mockRESTClient);
+
+        Assertions.assertTrue(httpRestCLIApplicationUnderTest.generateAirportReport().isEmpty());
     }
 }
